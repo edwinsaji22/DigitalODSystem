@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Leave/OD (On-Duty) Application System - Unified Portal</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--bg-page);
+            padding: 24px;
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 460px;
+            background: #FFFFFF;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.06);
+            padding: 38px 36px;
+            position: relative;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .auth-logo-badge {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-md);
+            background: var(--primary-gradient);
+            color: #FFFFFF;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
+            margin-bottom: 12px;
+        }
+
+        .auth-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.4px;
+            line-height: 1.25;
+        }
+
+        .auth-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 5px;
+            font-weight: 500;
+        }
+
+        .role-selector-wrap {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            background-color: #F1F5F9;
+            padding: 4px;
+            border-radius: var(--radius-md);
+            margin-bottom: 20px;
+        }
+
+        .role-option {
+            text-align: center;
+            padding: 8px 4px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            user-select: none;
+        }
+
+        .role-option.active {
+            background-color: #FFFFFF;
+            color: var(--primary);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+        }
+
+        .role-option.active[data-role="staff"] {
+            color: var(--success);
+        }
+
+        .role-option.active[data-role="hod"] {
+            color: var(--purple);
+        }
+
+        .input-wrap {
+            margin-bottom: 16px;
+        }
+
+        .inline-error {
+            color: #EF4444;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .auth-switch-link {
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .auth-switch-link a {
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .demo-pill-footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        .demo-pill-footer b {
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="auth-container">
+        <div class="auth-header">
+            <div class="auth-logo-badge">&#127891;</div>
+            <h1 class="auth-title">Digital Leave/OD (On-Duty) Application System</h1>
+            <p class="auth-subtitle">Academic Leave &amp; Student Service Desk</p>
+        </div>
+
+        <!-- Dynamic Feedback Alert Message -->
+        <div id="status-alert" class="alert" style="display: none;"></div>
+
+        <!-- ================= LOGIN VIEW ================= -->
+        <div id="login-section">
+            <label style="font-size: 12px; font-weight: 700; margin-bottom: 6px; display: block;">Select Portal Role:</label>
+            <div class="role-selector-wrap" id="role-selector">
+                <div class="role-option active" data-role="student" onclick="selectRole('student')">Student</div>
+                <div class="role-option" data-role="staff" onclick="selectRole('staff')">Faculty Staff</div>
+                <div class="role-option" data-role="hod" onclick="selectRole('hod')">HOD</div>
+            </div>
+
+            <form id="loginForm" action="loginServlet" method="POST" onsubmit="handleLoginSubmit(event)">
+                <input type="hidden" name="role" id="login-role" value="student">
+                <input type="hidden" name="jsonPayload" id="login-json-payload">
+
+                <div class="input-wrap">
+                    <label class="field-label" for="login-username">Username</label>
+                    <input type="text" class="form-control" id="login-username" name="username" placeholder="e.g. studentjohn, edwin21, staffjacob" autocomplete="username">
+                    <div class="inline-error" id="err-login-user">Username is required (minimum 3 characters).</div>
+                </div>
+
+                <div class="input-wrap">
+                    <label class="field-label" for="login-password">Password</label>
+                    <input type="password" class="form-control" id="login-password" name="password" placeholder="Enter your portal password" autocomplete="current-password">
+                    <div class="inline-error" id="err-login-pass">Password must be at least 6 characters.</div>
+                </div>
+
+                <button type="submit" id="btn-login-submit" class="btn-submit-primary" style="width: 100%; margin-top: 8px; justify-content: center;">
+                    Sign In to Portal &rarr;
+                </button>
+            </form>
+
+            <div class="auth-switch-link">
+                New student? <a onclick="toggleForm('register')">Create an Account</a>
+            </div>
+
+            <!-- Quick Demo Credentials Box -->
+            <div class="demo-credentials-card" style="margin-top: 18px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: var(--radius-md); padding: 12px 14px; text-align: left;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px;">Quick Demo Logins (Click to Fill)</span>
+                    <span style="font-size: 10px; background: #EEF2FF; color: var(--primary); padding: 2px 6px; border-radius: 4px; font-weight: 700;">Click to Test</span>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+                    <button type="button" class="btn-demo-card" onclick="fillCredentials('studentjohn', 'pass123', 'student')" style="background: #FFFFFF; border: 1px solid #CBD5E1; border-radius: 6px; padding: 6px 8px; text-align: left; cursor: pointer; transition: all 0.15s ease;">
+                        <div style="font-size: 11px; font-weight: 700; color: var(--primary);">&#127891; Student</div>
+                        <div style="font-size: 11px; color: var(--text-primary); font-family: monospace; font-weight: 600;">studentjohn</div>
+                        <div style="font-size: 10px; color: var(--text-muted);">pass123</div>
+                    </button>
+                    <button type="button" class="btn-demo-card" onclick="fillCredentials('staffjacob', 'jacob1234', 'staff')" style="background: #FFFFFF; border: 1px solid #CBD5E1; border-radius: 6px; padding: 6px 8px; text-align: left; cursor: pointer; transition: all 0.15s ease;">
+                        <div style="font-size: 11px; font-weight: 700; color: var(--success);">&#128104;&#8205;&#127979; Staff</div>
+                        <div style="font-size: 11px; color: var(--text-primary); font-family: monospace; font-weight: 600;">staffjacob</div>
+                        <div style="font-size: 10px; color: var(--text-muted);">jacob1234</div>
+                    </button>
+                    <button type="button" class="btn-demo-card" onclick="fillCredentials('hodsmith', 'hod1234', 'hod')" style="background: #FFFFFF; border: 1px solid #CBD5E1; border-radius: 6px; padding: 6px 8px; text-align: left; cursor: pointer; transition: all 0.15s ease;">
+                        <div style="font-size: 11px; font-weight: 700; color: var(--purple);">&#127979; HOD</div>
+                        <div style="font-size: 11px; color: var(--text-primary); font-family: monospace; font-weight: 600;">hodsmith</div>
+                        <div style="font-size: 10px; color: var(--text-muted);">hod1234</div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= REGISTRATION VIEW ================= -->
+        <div id="register-section" style="display: none;">
+            <div style="background-color: var(--primary-light); border: 1px solid var(--primary-border); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 16px; font-size: 12px; color: var(--primary); font-weight: 600;">
+                <strong>Student Registration:</strong> Your Roll Number will serve as your Login ID.
+            </div>
+
+            <form id="registerForm" action="registerServlet" method="POST" onsubmit="handleRegisterSubmit(event)">
+                <div class="input-wrap">
+                    <label class="field-label" for="reg-rollNo">Roll Number (Login ID) <span class="required">*</span></label>
+                    <input type="text" class="form-control" id="reg-rollNo" name="rollNo" placeholder="e.g. 21CS045, 21MCA015" autocomplete="username">
+                    <div class="inline-error" id="err-reg-roll">Roll number cannot be empty.</div>
+                </div>
+
+                <div class="input-wrap">
+                    <label class="field-label" for="reg-fullName">Student Full Name <span class="required">*</span></label>
+                    <input type="text" class="form-control" id="reg-fullName" name="fullName" placeholder="e.g. Edwin Saji">
+                    <div class="inline-error" id="err-reg-name">Student full name cannot be empty.</div>
+                </div>
+
+                <div class="input-wrap">
+                    <label class="field-label" for="reg-password">Password <span class="required">*</span></label>
+                    <input type="password" class="form-control" id="reg-password" name="password" placeholder="Create a secure password (min 6 characters)" autocomplete="new-password">
+                    <div class="inline-error" id="err-reg-pass">Password must be at least 6 characters.</div>
+                </div>
+
+                <button type="submit" id="btn-reg-submit" class="btn-submit-primary" style="width: 100%; margin-top: 8px; justify-content: center;">
+                    Register Student Account &rarr;
+                </button>
+            </form>
+
+            <div class="auth-switch-link">
+                Already registered? <a onclick="toggleForm('login')">Return to Login</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="demo-pill-footer" style="margin-top: 20px; text-align: center; font-size: 12px; color: var(--text-light);">
+        Default Accounts &bull; <b>studentjohn</b> / <b>21MCA015</b> (pass123) &bull; <b>staffjacob</b> (jacob1234) &bull; <b>hodsmith</b> (hod1234)
+    </div>
+
+    <script>
+        // Check URL Query Parameters for notifications
+        window.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const alertBox = document.getElementById('status-alert');
+
+            if (params.get('error') === 'exists') {
+                alertBox.className = 'alert alert-error';
+                alertBox.innerHTML = '&#9888; <strong>Registration Error:</strong> Account with this Roll Number already exists! Please sign in.';
+                alertBox.style.display = 'flex';
+            } else if (params.has('error')) {
+                alertBox.className = 'alert alert-error';
+                alertBox.innerHTML = '&#9888; <strong>Login Failed:</strong> Invalid credentials or incorrect portal role. Please try again.';
+                alertBox.style.display = 'flex';
+            } else if (params.has('registered')) {
+                alertBox.className = 'alert alert-success';
+                alertBox.innerHTML = '&#10003; <strong>Registration Complete:</strong> Student account created successfully. Please sign in with your Roll Number.';
+                alertBox.style.display = 'flex';
+            } else if (params.has('loggedOut')) {
+                alertBox.className = 'alert alert-info';
+                alertBox.innerHTML = '&#9432; <strong>Session Ended:</strong> You have been logged out securely.';
+                alertBox.style.display = 'flex';
+            } else if (params.has('unauthorized')) {
+                alertBox.className = 'alert alert-error';
+                alertBox.innerHTML = '&#9888; <strong>Access Denied:</strong> Active session required. Please sign in to access your portal.';
+                alertBox.style.display = 'flex';
+            } else if (params.has('reg_error')) {
+                const msg = params.get('msg') || 'Account with this Roll Number already exists! Please sign in.';
+                alertBox.className = 'alert alert-error';
+                alertBox.innerHTML = '&#9888; <strong>Registration Error:</strong> ' + decodeURIComponent(msg);
+                alertBox.style.display = 'flex';
+            }
+        });
+
+        // Role Selector Handler
+        function selectRole(role) {
+            document.getElementById('login-role').value = role;
+            document.querySelectorAll('.role-option').forEach(el => {
+                if (el.getAttribute('data-role') === role) {
+                    el.classList.add('active');
+                } else {
+                    el.classList.remove('active');
+                }
+            });
+
+            // Adjust submit button color according to role theme
+            const submitBtn = document.getElementById('btn-login-submit');
+            if (role === 'staff') {
+                submitBtn.style.background = 'var(--success)';
+            } else if (role === 'hod') {
+                submitBtn.style.background = 'var(--purple)';
+            } else {
+                submitBtn.style.background = 'var(--primary)';
+            }
+        }
+
+        // Quick Fill Demo Credentials
+        function fillCredentials(username, password, role) {
+            if (document.getElementById('register-section').style.display !== 'none') {
+                toggleForm('login');
+            }
+            selectRole(role);
+            const userField = document.getElementById('login-username');
+            const passField = document.getElementById('login-password');
+            userField.value = username;
+            passField.value = password;
+            document.querySelectorAll('.inline-error').forEach(e => e.style.display = 'none');
+            userField.focus();
+        }
+
+        // View Toggling between Login and Registration
+        function toggleForm(target) {
+            const loginSection = document.getElementById('login-section');
+            const regSection = document.getElementById('register-section');
+            const alertBox = document.getElementById('status-alert');
+            alertBox.style.display = 'none';
+
+            // Clear errors
+            document.querySelectorAll('.inline-error').forEach(e => e.style.display = 'none');
+
+            if (target === 'register') {
+                loginSection.style.display = 'none';
+                regSection.style.display = 'block';
+            } else {
+                regSection.style.display = 'none';
+                loginSection.style.display = 'block';
+            }
+        }
+
+        // Direct Login Submission (Silent Console Logging without UI Box)
+        function handleLoginSubmit(e) {
+            e.preventDefault();
+            const role = document.getElementById('login-role').value;
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+
+            let isValid = true;
+
+            const errUser = document.getElementById('err-login-user');
+            if (!username || username.length < 3) {
+                errUser.style.display = 'block';
+                isValid = false;
+            } else {
+                errUser.style.display = 'none';
+            }
+
+            const errPass = document.getElementById('err-login-pass');
+            if (!password || password.length < 6) {
+                errPass.style.display = 'block';
+                isValid = false;
+            } else {
+                errPass.style.display = 'none';
+            }
+
+            if (!isValid) return;
+
+            // Background logging only (no popup UI)
+            console.log("Login Payload:", JSON.stringify({
+                action: "login",
+                role: role,
+                username: username,
+                timestamp: new Date().toISOString()
+            }));
+
+            // Submit directly to Servlet
+            document.getElementById('loginForm').submit();
+        }
+
+        // Direct Student Registration Submission
+        function handleRegisterSubmit(e) {
+            e.preventDefault();
+            const rollNo = document.getElementById('reg-rollNo').value.trim();
+            const fullName = document.getElementById('reg-fullName').value.trim();
+            const password = document.getElementById('reg-password').value.trim();
+
+            let isValid = true;
+
+            const errRoll = document.getElementById('err-reg-roll');
+            if (!rollNo || rollNo.length < 3) {
+                errRoll.style.display = 'block';
+                isValid = false;
+            } else {
+                errRoll.style.display = 'none';
+            }
+
+            const errName = document.getElementById('err-reg-name');
+            if (!fullName || fullName.length < 2) {
+                errName.style.display = 'block';
+                isValid = false;
+            } else {
+                errName.style.display = 'none';
+            }
+
+            const errPass = document.getElementById('err-reg-pass');
+            if (!password || password.length < 6) {
+                errPass.style.display = 'block';
+                isValid = false;
+            } else {
+                errPass.style.display = 'none';
+            }
+
+            if (!isValid) return;
+
+            // Background logging only (no popup UI)
+            console.log("Register Payload:", JSON.stringify({
+                action: "register",
+                role: "student",
+                rollNo: rollNo,
+                fullName: fullName,
+                timestamp: new Date().toISOString()
+            }));
+
+            // Submit directly to Servlet
+            document.getElementById('registerForm').submit();
+        }
+    </script>
+</body>
+</html>

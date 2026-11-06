@@ -1,0 +1,70 @@
+{
+  "system": "Digital Leave / On-Duty (OD) Application System",
+  "institution": "Department of Computer Applications (MCA)",
+  "version": "1.0.0",
+  "policy": {
+    "maxSemesterQuotaDays": 15,
+    "submissionTimelineConstraintDays": 3,
+    "requirePriorAuthorization": true,
+    "requireStaffVerification": true,
+    "requireHodApproval": true
+  },
+  "categories": [
+    {
+      "code": "NSS",
+      "name": "NSS / NCC / Institutional Duty",
+      "maxDaysPerEvent": 3,
+      "authorizedBodies": ["NSS Unit", "NCC Wing", "Student Welfare Office"],
+      "description": "State/National level camps, campus volunteering, flag hosting drills."
+    },
+    {
+      "code": "Placement",
+      "name": "Placement / Job Drives",
+      "maxDaysPerEvent": 2,
+      "authorizedBodies": ["Centre for Placements and Career Services"],
+      "description": "On-campus or off-campus recruitment rounds, technical interviews, assessment drives."
+    },
+    {
+      "code": "Internship",
+      "name": "Internship / Industrial Visit",
+      "maxDaysPerEvent": 10,
+      "authorizedBodies": ["Department Academic Council", "Head of Department"],
+      "description": "Course-mandated industry internships, research collaborations, offsite industry projects."
+    },
+    {
+      "code": "Cultural",
+      "name": "Inter-Collegiate Fest / Cultural",
+      "maxDaysPerEvent": 3,
+      "authorizedBodies": ["Literary & Cultural Association (LCA)", "Music/Dance Club"],
+      "description": "University fests, fine arts, theatre, debating competitions representing the college."
+    },
+    {
+      "code": "Sports",
+      "name": "Sports / Athletic Tournament",
+      "maxDaysPerEvent": 5,
+      "authorizedBodies": ["Department of Physical Education"],
+      "description": "Inter-collegiate, university zonal, state or national athletic meets."
+    },
+    {
+      "code": "Academic",
+      "name": "Conference / Paper Presentation / Hackathon",
+      "maxDaysPerEvent": 3,
+      "authorizedBodies": ["ACM Student Chapter", "IEEE Student Branch", "Research Cell"],
+      "description": "Technical symposiums, hackathons, IEEE conferences, presenting research publications."
+    }
+  ],
+  "roles": [
+    {
+      "role": "student",
+      "permissions": ["submit_od", "view_own_history", "export_od_data", "view_live_api"]
+    },
+    {
+      "role": "staff",
+      "permissions": ["review_department_requests", "verify_request", "reject_request", "export_all_data"]
+    },
+    {
+      "role": "hod",
+      "permissions": ["final_sanction", "approve_request", "reject_request", "system_audit"]
+    }
+  ]
+}

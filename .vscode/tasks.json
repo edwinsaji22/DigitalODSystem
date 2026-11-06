@@ -1,0 +1,64 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Deploy to Tomcat",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\deploy.ps1",
+        "-TomcatPath",
+        "C:\\apache-tomcat-9.0.122"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Start Tomcat Server",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-Command",
+        "Start-Process -FilePath 'C:\\apache-tomcat-9.0.122\\bin\\startup.bat'"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Stop Tomcat Server",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-Command",
+        "& 'C:\\apache-tomcat-9.0.122\\bin\\shutdown.bat'"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Deploy & Start Tomcat",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "Deploy to Tomcat",
+        "Start Tomcat Server"
+      ],
+      "problemMatcher": []
+    }
+  ]
+}

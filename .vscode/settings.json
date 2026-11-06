@@ -1,0 +1,11 @@
+{
+  "java.project.sourcePaths": [
+    "."
+  ],
+  "java.project.referencedLibraries": [
+    "WEB-INF/lib/*.jar",
+    "WEB-INF/lib/**/*.jar",
+    "WEB-INF/lib/servlet-api.jar",
+    "WEB-INF/lib/mysql-connector-j-26.7.0.jar"
+  ]
+}
